@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def load_title_basics(path: Path):
-    title_basics = pd.read_csv(path / 'title.basics.tsv', sep='\t')
+    title_basics = pd.read_csv(path / 'title.basics.tsv.gz', sep='\t', compression='gzip')
 
     def parse_genres(genres):
         if isinstance(genres, float) or genres == r'\N':
@@ -37,12 +37,12 @@ def load_title_basics(path: Path):
 
 
 def load_title_ratings(path: Path):
-    return pd.read_csv(path / 'title.ratings.tsv', sep='\t')
+    return pd.read_csv(path / 'title.ratings.tsv.gz', sep='\t', compression='gzip')
 
 
 def load_movie_directors(path: Path):
     # Me quedo solo con los que fueron directores
-    principals_df = pd.read_csv(path / 'title.principals.tsv', sep='\t')
+    principals_df = pd.read_csv(path / 'title.principals.tsv.gz', sep='\t', compression='gzip')
 
     movies_directors = principals_df[principals_df.category == 'director'].copy()
     # Calculo un ranking por pelicula segun el ordering
