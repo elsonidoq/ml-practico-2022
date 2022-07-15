@@ -3,6 +3,10 @@ import pandas as pd
 
 
 class CrewFeatures(BaseEstimator, TransformerMixin):
+    # Una forma de mejorar esto es usando empirical bayes
+    # https://www.kaggle.com/code/vprokopev/mean-likelihood-encodings-a-comprehensive-study/notebook
+    # seccion 4.2 Using the prior probability for regularisation
+
     def __init__(self, field, min_cnt_movies=2):
         self.field = field
         self.min_cnt_movies = min_cnt_movies
