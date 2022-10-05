@@ -3,6 +3,9 @@ from .serialize import iter_jl
 
 
 def date_split(X, y, cut):
+    """
+    Funcion util para partir los datos segun una fecha de corte
+    """
     X_train, X_test = [], []
     y_train, y_test = [], []
     for x_i, y_i in zip(X, y):
@@ -14,6 +17,9 @@ def date_split(X, y, cut):
 
 
 def load_train_dev_test(data_path):
+    """
+    Permite levantar los datos
+    """
     X, y = map(list, map(iter_jl, [path.join(data_path, 'X_train.jl'), path.join(data_path, 'y_train.jl')]))
 
     X_train, X_test, y_train, y_test = date_split(X, y, '2021-03-01')

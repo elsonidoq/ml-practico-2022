@@ -1,6 +1,8 @@
 import json
 
 
+# Funciones utiles para escribir y leer un archivo en formato json lines
+
 def write_jl(docs, fname):
     with open(fname, 'w') as f:
         for i, doc in enumerate(docs):
