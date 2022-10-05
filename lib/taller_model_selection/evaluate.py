@@ -48,13 +48,17 @@ class Evaluator:
         self.evaluations = []
 
     def eval_pipe(self, model_name, pipe):
-        res = dict(
-            name=model_name,
-            train=rmse(self.y_train, pipe.predict(self.X_train)),
-            dev=rmse(self.y_dev, pipe.predict(self.X_dev))
-        )
-
+        res = self.eval_prediction(model_name, pipe.predict(self.X_train), pipe.predict(self.X_dev))
         if self.X_test is not None:
             res['test'] = rmse(self.y_test, pipe.predict(self.X_test))
+        return res
+
+    def eval_prediction(self, model_name, y_hat_train, y_hat_dev):
+        res = dict(
+            name=model_name,
+            train=rmse(self.y_train, y_hat_train),
+            dev=rmse(self.y_dev, y_hat_dev)
+        )
+
         self.evaluations.append(res)
         return res
