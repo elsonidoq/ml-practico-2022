@@ -45,6 +45,7 @@ class Evaluator:
         self.y_dev = y_dev
         self.X_test = X_test
         self.y_test = y_test
+        self.evaluations = []
 
     def eval_pipe(self, model_name, pipe):
         res = dict(
@@ -55,4 +56,5 @@ class Evaluator:
 
         if self.X_test is not None:
             res['test'] = rmse(self.y_test, pipe.predict(self.X_test))
+        self.evaluations.append(res)
         return res
