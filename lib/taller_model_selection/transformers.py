@@ -43,6 +43,6 @@ class PretrainedFastTextTransformer(BaseEstimator, TransformerMixin):
     def transform(self, X):
         res = []
         for doc in X:
-            value = doc[self.field]
+            value = doc[self.field].replace('\n', '')
             res.append(self.model_.get_sentence_vector(value))
         return np.asarray(res)
