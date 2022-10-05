@@ -1,3 +1,4 @@
+from sklearn.metrics import mean_squared_error
 from os import path
 from .serialize import iter_jl
 
@@ -30,3 +31,28 @@ def load_train_dev_test(data_path):
         'pct(test)': len(y_test) / len(X)
     })
     return (X_train, y_train), (X_dev, y_dev), (X_test, y_test)
+
+
+def rmse(y_true, y_pred):
+    return mean_squared_error(y_true, y_pred) ** 0.5
+
+
+class Evaluator:
+    def __init__(self, X_train, y_train, X_dev, y_dev, X_test=None, y_test=None):
+        self.X_train = X_train
+        self.y_train = y_train
+        self.X_dev = X_dev
+        self.y_dev = y_dev
+        self.X_test = X_test
+        self.y_test = y_test
+
+    def eval_pipe(self, model_name, pipe):
+        res = dict(
+            name=model_name,
+            train=rmse(self.y_train, pipe.predict(self.X_train)),
+            dev=rmse(self.y_dev, pipe.predict(self.X_dev))
+        )
+
+        if self.X_test is not None:
+            res['test'] = rmse(self.y_test, pipe.predict(self.X_test))
+        return res
