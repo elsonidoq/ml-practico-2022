@@ -1,4 +1,4 @@
-from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_percentage_error
 from os import path
 from .serialize import iter_jl
 
@@ -33,9 +33,6 @@ def load_train_dev_test(data_path):
     return (X_train, y_train), (X_dev, y_dev), (X_test, y_test)
 
 
-def rmse(y_true, y_pred):
-    return mean_squared_error(y_true, y_pred) ** 0.5
-
 
 class Evaluator:
     def __init__(self, X_train, y_train, X_dev, y_dev, X_test=None, y_test=None):
@@ -50,14 +47,14 @@ class Evaluator:
     def eval_pipe(self, model_name, pipe):
         res = self.eval_prediction(model_name, pipe.predict(self.X_train), pipe.predict(self.X_dev))
         if self.X_test is not None:
-            res['test'] = rmse(self.y_test, pipe.predict(self.X_test))
+            res['test'] = mean_absolute_percentage_error(self.y_test, pipe.predict(self.X_test))
         return res
 
     def eval_prediction(self, model_name, y_hat_train, y_hat_dev):
         res = dict(
             name=model_name,
-            train=rmse(self.y_train, y_hat_train),
-            dev=rmse(self.y_dev, y_hat_dev)
+            train=mean_absolute_percentage_error(self.y_train, y_hat_train),
+            dev=mean_absolute_percentage_error(self.y_dev, y_hat_dev)
         )
 
         self.evaluations.append(res)
