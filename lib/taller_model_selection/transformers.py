@@ -1,4 +1,3 @@
-import fasttext
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 
@@ -39,6 +38,11 @@ class PretrainedFastTextTransformer(BaseEstimator, TransformerMixin):
 
     def sync_resources(self):
         if self.model_ is None:
+            # Lazy import. Solo falla si lo usas.
+            try:
+                import fasttext
+            except ImportError:
+                raise ImportError('Falta instalar fasttext. \n \n pip install fasttext \n \n')
             self.model_ = fasttext.load_model(self.fname)
 
     def fit(self, X, y):
