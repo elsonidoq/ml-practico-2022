@@ -33,6 +33,9 @@ def load_train_dev_test(data_path):
     return (X_train, y_train), (X_dev, y_dev), (X_test, y_test)
 
 
+def load_submission_data(data_path)
+    return list(iter_jl(path.join(data_path, 'X_test.jl')))
+
 def rmse(y_true, y_pred):
     return mean_squared_error(y_true, y_pred) ** 0.5
 
