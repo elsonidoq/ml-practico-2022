@@ -35,14 +35,29 @@ class PretrainedFastTextTransformer(BaseEstimator, TransformerMixin):
     def __init__(self, fname, field):
         self.fname = fname
         self.field = field
+        self.model_ = None
+
+    def sync_resources(self):
+        if self.model_ is None:
+            self.model_ = fasttext.load_model(self.fname)
 
     def fit(self, X, y):
-        self.model_ = fasttext.load_model(self.fname)
+        self.sync_resources()
         return self
 
     def transform(self, X):
+        self.sync_resources()
         res = []
         for doc in X:
             value = doc[self.field].replace('\n', '')
             res.append(self.model_.get_sentence_vector(value))
         return np.asarray(res)
+
+    def __getstate__(self):
+        state = vars(self).copy()
+        state['model_'] = None
+        return state
+
+    def __setstate__(self, state):
+        vars(self).update(state)
+
