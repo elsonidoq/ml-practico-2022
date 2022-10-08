@@ -35,7 +35,8 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
     [mean(y), std(y), percentile(y, 5), percentile(y, 95)]
     """
 
-    def __init__(self, categorical_field):
+    def __init__(self, categorical_field, min_freq=5):
+        self.min_freq = min_freq
         self.categorical_field = categorical_field
         self.stats_ = None
         self.default_stats = None
@@ -47,10 +48,11 @@ class TargetEncoder(BaseEstimator, TransformerMixin):
 
         self.stats_ = {}
         for cat_value, tar_values in values.items():
+            if len(tar_values) < self.min_freq: continue
             tar_values = np.asarray(tar_values)
             self.stats_[cat_value] = [
                 np.mean(tar_values), np.std(tar_values),
-                np.percentile(tar_values, 90), np.percentile(tar_values, 10)
+                np.percentile(tar_values, 90), np.percentile(tar_values, 10),
             ]
 
         self.default_stats_ = [
