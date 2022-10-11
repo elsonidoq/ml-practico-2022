@@ -1,6 +1,7 @@
 from collections import defaultdict
 
 import numpy as np
+from scipy.spatial import cKDTree
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -109,3 +110,56 @@ class PretrainedFastTextTransformer(BaseEstimator, TransformerMixin):
 
     def __setstate__(self, state):
         vars(self).update(state)
+
+
+class ZonePriceM2(BaseEstimator, TransformerMixin):
+    """
+    Precio por metro cuadrado de los alrededores
+    n_neigbours: cuantos vecinos considerar
+    uniform_weight: booleano, si hacer la estimacion pesada por la distancia o no
+    """
+
+    def __init__(self, n_neighbours, uniform_weight=False):
+        self.n_neighbours = n_neighbours
+        self.uniform_weight = uniform_weight
+
+    def fit(self, X, y):
+        mask = np.asarray([not np.isnan(e['surface_total']) for e in X])
+        coordinates = np.asarray([(e['lat'], e['lon']) for e in X])[mask]
+        surfaces = np.asarray([e['surface_total'] for e in X])[mask]
+        target = np.asarray(y)[mask] / surfaces
+
+        self.index_ = cKDTree(coordinates)
+        self.target_ = target
+
+        # Cuando no tenemos datos de lat, lon podemos usar el l3 de fallback
+        # para poder dar algun valor a esta feature
+        l3_coords_stats = defaultdict(list)
+        for row in X:
+            lat, lon = row['lat'], row['lon']
+            if np.isnan([lat, lon]).sum() > 0: continue
+            l3_coords_stats[row['l3']].append([lat, lon])
+
+        self.l3_centroid_ = {
+            l3: np.asarray(coords).mean(axis=0)
+            for l3, coords in l3_coords_stats.items()
+        }
+        return self
+
+    def transform(self, X):
+        res = []
+        uniform_distance = np.asarray([0] * self.n_neighbours)
+
+        for row in X:
+            lat, lon = row['lat'], row['lon']
+            if np.isnan([lat, lon]).sum() > 0:
+                lat, lon = self.l3_centroid_[row['l3']]
+
+            distances, indices = self.index_.query((lat, lon), k=self.n_neighbours)
+
+            if self.uniform_weight:
+                distances = uniform_distance
+
+            estimate = (self.target_[indices] * (1 - distances)).sum() / (1 - distances).sum()
+            res.append([estimate])
+        return np.asarray(res)
