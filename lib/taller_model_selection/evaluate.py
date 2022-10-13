@@ -1,5 +1,8 @@
 from sklearn.metrics import mean_squared_error
 from os import path
+
+from sklearn.model_selection import train_test_split
+
 from .serialize import iter_jl
 
 
@@ -23,8 +26,9 @@ def load_train_dev_test(data_path):
     """
     X, y = map(list, map(iter_jl, [path.join(data_path, 'X_train.jl'), path.join(data_path, 'y_train.jl')]))
 
-    X_train, X_test, y_train, y_test = date_split(X, y, '2021-03-01')
-    X_dev, X_test, y_dev, y_test = date_split(X_test, y_test, '2021-04-15')
+    X_train, X_test, y_train, y_test = date_split(X, y, '2021-04-15')
+    X_train, X_dev, y_train, y_dev = train_test_split(X_train, y_train, train_size=0.9, random_state=42)
+    train_test_split()
     print({
         'pct(train)': len(X_train) / len(X),
         'pct(dev)': len(X_dev) / len(X),
