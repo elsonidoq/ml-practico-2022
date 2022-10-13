@@ -28,7 +28,6 @@ def load_train_dev_test(data_path):
 
     X_train, X_test, y_train, y_test = date_split(X, y, '2021-04-15')
     X_train, X_dev, y_train, y_dev = train_test_split(X_train, y_train, train_size=0.9, random_state=42)
-    train_test_split()
     print({
         'pct(train)': len(X_train) / len(X),
         'pct(dev)': len(X_dev) / len(X),
